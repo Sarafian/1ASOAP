@@ -19,7 +19,7 @@ This repository is meant to help simplify PowerShell scripting against [Amadeus'
 ## Implementation details
 
 - Instead of generating SOAP envelops and **POST**ing them to the 1A endpoint, use the [New-WebServiceProxy][7] cmdlet to generate a typed proxy and worked with typed memory objects.
-- **Note* that [New-WebServiceProxy][7] is not implemented in PowerShell Core, since the underlying .NET Core doesn't support the `System.ServiceModel` assembly. For this reason, this module [SOAPProxy][3] requires **PowerShell 5.1**.
+- **Note* that [New-WebServiceProxy][7] is not implemented in PowerShell Core, since the underlying .NET Core doesn't support the `System.ServiceModel` assembly. For this reason, this module [SOAPProxy][4] requires **PowerShell 5.1**.
 - With composite and nested type objects, the code becomes very verbose in order to set a property or find objects based on a condition.
 
 For example for the `PNR_Retrieve` request we want to use expressions like `retrievalFacts.retrieve.type` to set or refer to the matching object in the respected XML:
@@ -45,8 +45,8 @@ The repository is composed by 3 modules. Each can be isolated and has the potent
 - [JSONPath][3] that provides basic functionality similar to Stefan's Goessner [JSONPath][6] concept. **Note** that 
   - this is not a full implementation of the idea, but it can be further extender.
   - it uses the same concepts both to drive `Set`, `Get`, `Test` and `Find`
-- [SOAPProxy][3] that provides some basic functionality around [New-WebServiceProxy][7] to address the dynamic injection of .NET assemblies into the session. 
-- [A1SOAP][4] that provides functionality around the 1A `Session` and `AMA_SecurityHostedUser` headers
+- [SOAPProxy][4] that provides some basic functionality around [New-WebServiceProxy][7] to address the dynamic injection of .NET assemblies into the session. 
+- [A1SOAP][5] that provides functionality around the 1A `Session` and `AMA_SecurityHostedUser` headers
 
 ## Samples
 
