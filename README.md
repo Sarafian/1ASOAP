@@ -19,7 +19,7 @@ This repository is meant to help simplify PowerShell scripting against [Amadeus'
 ## Implementation details
 
 - Instead of generating SOAP envelops and **POST**ing them to the 1A endpoint, use the [New-WebServiceProxy][7] cmdlet to generate a typed proxy and worked with typed memory objects.
-- **Note* that [New-WebServiceProxy][7] is not implemented in PowerShell Core, since the underlying .NET Core doesn't support the `System.ServiceModel` assembly. For this reason, this module [SOAPHelper][3] requires **PowerShell 5.1**.
+- **Note* that [New-WebServiceProxy][7] is not implemented in PowerShell Core, since the underlying .NET Core doesn't support the `System.ServiceModel` assembly. For this reason, this module [SOAPProxy][3] requires **PowerShell 5.1**.
 - With composite and nested type objects, the code becomes very verbose in order to set a property or find objects based on a condition.
 
 For example for the `PNR_Retrieve` request we want to use expressions like `retrievalFacts.retrieve.type` to set or refer to the matching object in the respected XML:
@@ -45,7 +45,7 @@ The repository is composed by 3 modules. Each can be isolated and has the potent
 - [JSONPath][3] that provides basic functionality similar to Stefan's Goessner [JSONPath][6] concept. **Note** that 
   - this is not a full implementation of the idea, but it can be further extender.
   - it uses the same concepts both to drive `Set`, `Get`, `Test` and `Find`
-- [SOAPHelper][3] that provides some basic functionality around [New-WebServiceProxy][7] to address the dynamic injection of .NET assemblies into the session. 
+- [SOAPProxy][3] that provides some basic functionality around [New-WebServiceProxy][7] to address the dynamic injection of .NET assemblies into the session. 
 - [A1SOAP][4] that provides functionality around the 1A `Session` and `AMA_SecurityHostedUser` headers
 
 ## Samples
@@ -81,7 +81,7 @@ finally
 [1]: https://www.amadeus.com
 [2]: https://developers.amadeus.com/enterprise
 [3]: Source/JSONPath/README.md
-[4]: Source/SOAPHelper/README.md
+[4]: Source/SOAPProxy/README.md
 [5]: Source/A1SOAP/README.md
 [6]: https://goessner.net/articles/JsonPath/
 [7]: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-webserviceproxy?view=powershell-5.1
