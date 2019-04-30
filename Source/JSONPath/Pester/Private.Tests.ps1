@@ -92,6 +92,109 @@ InModuleScope JSONPath {
 
     Describe "$prefix"{
         $rootType="JSONPath.Pester.Root" -as [type]
+        Context "Split" {
+            It "Split-JSONPath with segment <Segment>" -TestCases $valueCases {
+                param ( $Segment)
+                $root=New-Object -TypeName $rootType
+                $info=Get-JSONPathSegmentInfo -Segment $Segment
+                $typeInfo=Get-JSONPathSegmentTypeInfo -Type $rootType -Info $info
+
+                $actual=Split-JSONPath -InputObject $root -Path $Segment
+                $actual | Should -Not -BeNullOrEmpty
+                @($actual).Length  | Should -BeExactly 1
+                $actual.Segment |Should -BeExactly $typeInfo.Segment
+                $actual.PropertyName |Should -BeExactly $typeInfo.PropertyName
+                $actual.IsIndexDeclared |Should -BeExactly $typeInfo.IsIndexDeclared
+                $actual.PropertyType |Should -BeExactly $typeInfo.PropertyType
+                $actual.IsPropertyArray |Should -BeExactly $typeInfo.IsPropertyArray
+                $actual.ArrayElementType |Should -BeExactly $typeInfo.ArrayElementType
+                $actual.IsPrimitiveOrString |Should -BeExactly $typeInfo.IsPrimitiveOrString
+            }
+            It "Split-JSONPath with segment <Segment>" -TestCases $compositeCases {
+                param ( $Segment)
+                $root=New-Object -TypeName $rootType
+                $info=Get-JSONPathSegmentInfo -Segment $Segment
+                $typeInfo=Get-JSONPathSegmentTypeInfo -Type $rootType -Info $info
+
+                $actual=Split-JSONPath -InputObject $root -Path $Segment
+                $actual | Should -Not -BeNullOrEmpty
+                @($actual).Length  | Should -BeExactly 1
+                $actual.Segment |Should -BeExactly $typeInfo.Segment
+                $actual.PropertyName |Should -BeExactly $typeInfo.PropertyName
+                $actual.IsIndexDeclared |Should -BeExactly $typeInfo.IsIndexDeclared
+                $actual.PropertyType |Should -BeExactly $typeInfo.PropertyType
+                $actual.IsPropertyArray |Should -BeExactly $typeInfo.IsPropertyArray
+                $actual.ArrayElementType |Should -BeExactly $typeInfo.ArrayElementType
+                $actual.IsPrimitiveOrString |Should -BeExactly $typeInfo.IsPrimitiveOrString
+            }
+            It "Split-JSONPath with segment Type1Single.Type2Single.StringSingle" {
+                $root=New-Object -TypeName $rootType
+
+                $actual=Split-JSONPath -InputObject $root -Path "Type1Single.Type2Single.StringSingle"
+                $actual | Should -Not -BeNullOrEmpty
+                @($actual).Length  | Should -BeExactly 3
+                $actual[0].Segment |Should -BeExactly "Type1Single"
+                $actual[0].PropertyName |Should -BeExactly "Type1Single"
+                $actual[0].IsIndexDeclared |Should -BeExactly $false
+                $actual[0].Index |Should -BeExactly $null
+                $actual[0].PropertyType |Should -BeExactly ("JSONPath.Pester.Type1" -as [type])
+                $actual[0].IsPropertyArray |Should -BeExactly $false
+                $actual[0].ArrayElementType |Should -BeExactly $null
+                $actual[0].IsPrimitiveOrString |Should -BeExactly $false
+
+                $actual[1].Segment |Should -BeExactly "Type2Single"
+                $actual[1].PropertyName |Should -BeExactly "Type2Single"
+                $actual[1].IsIndexDeclared |Should -BeExactly $false
+                $actual[10].Index |Should -BeExactly $null
+                $actual[1].PropertyType |Should -BeExactly ("JSONPath.Pester.Type2" -as [type])
+                $actual[1].IsPropertyArray |Should -BeExactly $false
+                $actual[1].ArrayElementType |Should -BeExactly $null
+                $actual[1].IsPrimitiveOrString |Should -BeExactly $false
+
+                $actual[2].Segment |Should -BeExactly "StringSingle"
+                $actual[2].PropertyName |Should -BeExactly "StringSingle"
+                $actual[2].IsIndexDeclared |Should -BeExactly $false
+                $actual[2].Index |Should -BeExactly $null
+                $actual[2].PropertyType |Should -BeExactly ("System.String" -as [type])
+                $actual[2].IsPropertyArray |Should -BeExactly $false
+                $actual[2].ArrayElementType |Should -BeExactly $null
+                $actual[2].IsPrimitiveOrString |Should -BeExactly $true
+            }
+            It "Split-JSONPath with segment Type1Array.Type2Array[1].StringArray[3]" {
+                $root=New-Object -TypeName $rootType
+
+                $actual=Split-JSONPath -InputObject $root -Path "Type1Array.Type2Array[1].StringArray[3]"
+                $actual | Should -Not -BeNullOrEmpty
+                @($actual).Length  | Should -BeExactly 3
+                $actual[0].Segment |Should -BeExactly "Type1Array"
+                $actual[0].PropertyName |Should -BeExactly "Type1Array"
+                $actual[0].Index |Should -BeExactly $null
+                $actual[0].IsIndexDeclared |Should -BeExactly $false
+                $actual[0].PropertyType |Should -BeExactly ("JSONPath.Pester.Type1[]" -as [type])
+                $actual[0].IsPropertyArray |Should -BeExactly $true
+                $actual[0].ArrayElementType |Should -BeExactly "JSONPath.Pester.Type1"
+                $actual[0].IsPrimitiveOrString |Should -BeExactly $false
+
+                $actual[1].Segment |Should -BeExactly "Type2Array[1]"
+                $actual[1].PropertyName |Should -BeExactly "Type2Array"
+                $actual[1].IsIndexDeclared |Should -BeExactly $true
+                $actual[1].Index |Should -BeExactly 1
+                $actual[1].PropertyType |Should -BeExactly ("JSONPath.Pester.Type2[]" -as [type])
+                $actual[1].IsPropertyArray |Should -BeExactly $true
+                $actual[1].ArrayElementType |Should -BeExactly "JSONPath.Pester.Type2"
+                $actual[1].IsPrimitiveOrString |Should -BeExactly $false
+
+                $actual[2].Segment |Should -BeExactly "StringArray[3]"
+                $actual[2].PropertyName |Should -BeExactly "StringArray"
+                $actual[2].IsIndexDeclared |Should -BeExactly $true
+                $actual[2].Index |Should -BeExactly 3
+                $actual[2].PropertyType |Should -BeExactly ("System.String[]" -as [type])
+                $actual[2].IsPropertyArray |Should -BeExactly $true
+                $actual[2].ArrayElementType |Should -BeExactly "string"
+                $actual[2].IsPrimitiveOrString |Should -BeExactly $true
+
+            }
+        }
         Context "Set" {
             It "Set-JSONPathValue with <Segment>=<Value>" -TestCases $valueCases {
                 param ( $Segment, $Value, $ArrayLength)
