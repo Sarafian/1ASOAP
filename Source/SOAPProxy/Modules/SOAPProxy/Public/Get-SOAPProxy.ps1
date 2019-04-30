@@ -2,13 +2,13 @@ function Get-SOAPProxy
 {
     [OutputType([System.Object])]
     param(
-        [Parameter(Mandatory = $true, ParameterSetName = "Default")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Default")]
         [switch]$Default,
         [Parameter(Mandatory = $true, ParameterSetName = "Uri")]
         [string]$Uri,
         [Parameter(Mandatory = $true, ParameterSetName = "Proxy")]
         [System.Object]$Proxy,
-        [Parameter(Mandatory=$true, ParameterSetName = "Pipeline")]
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true, ParameterSetName = "Pipeline")]
         [System.Object]$PipedProxy,
         [Parameter(Mandatory=$true, ParameterSetName = "Hash")]
         [hashtable]$Hashtable
@@ -36,39 +36,37 @@ function Get-SOAPProxy
                 else {
                     Write-Debug "Found $($Proxy.GetType().AssemblyQualifiedName) as default proxy"
                 }
-                $Proxy
             }
             "Uri" { 
                 $variableUriName="SOAPProxy:Proxy:Uri:$Uri"
                 Write-Debug "variableUriName=$variableUriName"
                 
                 Write-Debug "Looking for variable $variableUriName containing proxy"
-                $proxy=Get-Variable -Name $variableUriName -ValueOnly  -Scope Global -ErrorAction SilentlyContinue
+                $Proxy=Get-Variable -Name $variableUriName -ValueOnly  -Scope Global -ErrorAction SilentlyContinue
     
-                if($null -ne $proxy)
+                if($null -ne $Proxy)
                 {
                     Write-Verbose "Found $($proxy.GetType().AssemblyQualifiedName) for $Uri"
                 }
             }
             "Proxy" { 
-                $Proxy
             }
             "Pipeline" { 
-                $PipedProxy 
+                $Proxy=$PipedProxy 
             }
             "Hash" { 
                 if($Hashtable.ContainsKey("PipedProxy"))
                 {
-                    $Hashtable.PipedProxy
+                    $Proxy=$Hashtable.PipedProxy
                 }
                 elseif ($Hashtable.ContainsKey("Proxy")) {
-                    $Hashtable.Proxy
+                    $Proxy=$Hashtable.Proxy
                 }
                 elseif ($Hashtable.ContainsKey("Uri")) {
-                    $Hashtable.Uri
+                    $Proxy=$Hashtable.Uri
                 }
                 else {
-                    Get-SOAPProxy -Default
+                    $Proxy=Get-SOAPProxy
                 }
             }
         }
@@ -76,5 +74,6 @@ function Get-SOAPProxy
 
     end
     {
+        $Proxy
     }
 }
