@@ -32,7 +32,7 @@ function Find-JSONPath
             $foundObject=$true
             while ($foundObject -and ($level -lt $typeInfos.Length-1)) {
                 $workingObject=$workingObject|ForEach-Object {
-                    Get-JSONPathComposite -InputObject $workingObject -TypeInfo $typeInfos[$level]
+                    Get-JSONPathComposite -InputObject $_ -TypeInfo $typeInfos[$level]
                 }| Where-Object { $_ -ne $null }
                 $foundObject=@($workingObject).Length -ne 0 
                 $level++
@@ -41,10 +41,15 @@ function Find-JSONPath
             {
                 $testValues=$workingObject|ForEach-Object {
                     $testSplat = @{ } + $PSBoundParameters
+                    $testSplat.Remove("InputObject")
                     $testSplat.Remove("Path")
+                    $testSplat.Add("InputObject", $_)
                     $testSplat.Add("TypeInfo", $typeInfos[$level])
-                    Test-JSONPathValue @testSplat
-                }| Where-Object { $_ -eq $true }
+                    if(Test-JSONPathValue @testSplat)
+                    {
+                        $_
+                    }
+                }
                 $foundObject=@($testValues).Length -ne 0
             }
             if($foundObject)

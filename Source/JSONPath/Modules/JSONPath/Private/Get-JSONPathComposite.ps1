@@ -17,8 +17,8 @@ function Get-JSONPathComposite
 
     process
     {
-        $propertyName = $segmentInfo.PropertyName
-        $segment=$segmentInfo.Segment
+        $propertyName = $TypeInfo.PropertyName
+        $segment=$TypeInfo.Segment
         if ($TypeInfo.IsIndexDeclared)
         {
             $index = $TypeInfo.Index

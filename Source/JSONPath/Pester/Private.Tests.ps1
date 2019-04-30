@@ -219,7 +219,9 @@ InModuleScope JSONPath {
                 $root=New-Object -TypeName $rootType
                 $info=Get-JSONPathSegmentInfo -Segment $Segment
                 $typeInfo=Get-JSONPathSegmentTypeInfo -Type $rootType -Info $info
-                Set-JSONPathComposite -InputObject $root -TypeInfo $typeInfo
+                $actual=Set-JSONPathComposite -InputObject $root -TypeInfo $typeInfo
+                $actual | Should -Not -BeNullOrEmpty
+
                 $propertyName=$info.PropertyName
                 $root.$propertyName | Should -Not -BeNullOrEmpty
                 if($ArrayLength)

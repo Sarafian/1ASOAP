@@ -27,12 +27,12 @@ function Set-JSONPathComposite
 
         if ($TypeInfo.IsPropertyArray -and (-not $TypeInfo.IsIndexDeclared)) {
             $normalizedIndex = 0
-            $normalizedSegment = "$($Info.Segment)[$normalizedIndex]"
+            $normalizedSegment = "$($TypeInfo.Segment)[$normalizedIndex]"
             Write-Warning "$prefix not declaring index when setting. Treating as $normalizedSegment"
         }
         else {
-            $normalizedIndex = $Info.Index
-            $normalizedSegment=$Info.Segment
+            $normalizedIndex = $TypeInfo.Index
+            $normalizedSegment=$TypeInfo.Segment
         }
         Write-Debug "$prefix normalizedSegment=$normalizedSegment | normalizedIndex=$normalizedIndex"
 
@@ -47,7 +47,7 @@ function Set-JSONPathComposite
                 # TODO: What if the array is of smaller length?
             }
         }
-
+        $returnObject=$null
         if($TypeInfo.IsPropertyArray)
         {
             # Make sure that the target property has a composite value
@@ -56,9 +56,7 @@ function Set-JSONPathComposite
                 $InputObject.$propertyName[$normalizedIndex] = New-Object $TypeInfo.ArrayElementType
                 Write-Debug "$prefix. New instance of $($TypeInfo.ArrayElementType)"
             }
-            else {
-                $InputObject.$propertyName[$normalizedIndex]
-            }
+            $returnObject=$InputObject.$propertyName[$normalizedIndex]
         }
         else
         {
@@ -67,10 +65,9 @@ function Set-JSONPathComposite
                 $InputObject.$propertyName = New-Object $TypeInfo.PropertyType
                 Write-Debug "$prefix. New instance of $($TypeInfo.PropertyType)"
             }
-            else {
-                $InputObject.$propertyName
-            }
+            $returnObject=$InputObject.$propertyName
         }
+        $returnObject
     }
 
     end

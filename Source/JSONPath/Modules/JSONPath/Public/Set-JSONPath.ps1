@@ -32,7 +32,7 @@ function Set-JSONPath
             Write-Verbose "Set Value $Value to $Path"
             if($PassThru)
             {
-                $InputObject
+                $_
             }
         }
     }
