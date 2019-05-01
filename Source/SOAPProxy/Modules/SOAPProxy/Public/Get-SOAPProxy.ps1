@@ -63,7 +63,7 @@ function Get-SOAPProxy
                     $Proxy=$Hashtable.Proxy
                 }
                 elseif ($Hashtable.ContainsKey("Uri")) {
-                    $Proxy=$Hashtable.Uri
+                    $Proxy=Get-SOAPProxy -Uri $Hashtable.Uri
                 }
                 else {
                     $Proxy=Get-SOAPProxy

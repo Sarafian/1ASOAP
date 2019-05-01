@@ -22,8 +22,13 @@ function New-SOAPProxyRequest
         
         $requestType=$info|Where-Object -Property Operation -EQ $Operation|Select-Object -ExpandProperty RequestType
         Write-Debug "requestType=$requestType"
-
-        New-Object -TypeName $requestType
+        if($requestType.FullName -eq "System.String")
+        {
+            ""
+        }
+        else {
+            New-Object -TypeName $requestType
+        }
     }
 
     end
