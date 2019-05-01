@@ -11,17 +11,18 @@ Set-Variable "prefix" -Value $prefix -Scope Global
 
 InModuleScope 1ASOAP {
     . $here\Cmdlets-Helpers\Get-RandomValue.ps1
-    . $here\Cmdlets-Helpers\New-1ASOAPProxyMock.ps1
+    . $here\Cmdlets-Helpers\Set-1ASOAPProxyMock.ps1
 
-    $mockProxy=New-1ASOAPProxyMock
+    $mockProxy=Set-1ASOAPProxyMock -PassThru
     Mock Get-SOAPProxy {
         $mockProxy
     }
 
     Describe "$prefix"{
         BeforeEach {
-            $mockProxy.SessionValue=([PSCustomObject]@{ID=1})
-            $mockProxy.AMA_SecurityHostedUserValue=([PSCustomObject]@{ID=1})
+            Set-1ASOAPProxyMock -Proxy $mockProxy
+#            $mockProxy.SessionValue=([PSCustomObject]@{ID=1})
+#            $mockProxy.AMA_SecurityHostedUserValue=([PSCustomObject]@{ID=1})
         }
         It "Clear-1ASOAPSession" {
             $proxy=Clear-1ASOAPSession 

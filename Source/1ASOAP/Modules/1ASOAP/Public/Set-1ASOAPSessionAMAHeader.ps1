@@ -37,11 +37,11 @@ function Set-1ASOAPSessionAMAHeader
 
         $Proxy |
             Clear-1ASOAPSessionAMAHeader -PassThru |
-            Set-segmentDeep -Expression "AMA_SecurityHostedUserValue.UserID.POS_Type" -Value $POSType -PassThru |
-            Set-segmentDeep -Expression "AMA_SecurityHostedUserValue.UserID.RequestorType" -Value $RequestorType -PassThru |
-            Set-segmentDeep -Expression "AMA_SecurityHostedUserValue.UserID.PseudoCityCode" -Value $PseudoCityCode -PassThru |
-            Set-segmentDeep -Expression "AMA_SecurityHostedUserValue.UserID.AgentDutyCode" -Value $AgentDutyCode -PassThru |
-            Set-segmentDeep -Expression "AMA_SecurityHostedUserValue.UserID.RequestorID.CompanyName.Value" -Value $CompanyName
+            Set-JSONPath -Path "AMA_SecurityHostedUserValue.UserID.POS_Type" -Value $POSType -PassThru |
+            Set-JSONPath -Path "AMA_SecurityHostedUserValue.UserID.RequestorType" -Value $RequestorType -PassThru |
+            Set-JSONPath -Path "AMA_SecurityHostedUserValue.UserID.PseudoCityCode" -Value $PseudoCityCode -PassThru |
+            Set-JSONPath -Path "AMA_SecurityHostedUserValue.UserID.AgentDutyCode" -Value $AgentDutyCode -PassThru |
+            Set-JSONPath -Path "AMA_SecurityHostedUserValue.UserID.RequestorID.CompanyName.Value" -Value $CompanyName
     }
 
     end
