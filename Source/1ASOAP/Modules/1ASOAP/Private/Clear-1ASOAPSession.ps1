@@ -4,10 +4,7 @@ function Clear-1ASOAPSession
         [Parameter(Mandatory = $false,ParameterSetName = "Parameter")]
         [System.Object]$Proxy,
         [Parameter(Mandatory = $true,ValueFromPipeline = $true, ParameterSetName = "Pipeline")]
-        [System.Object]$PipedProxy,<#
-        [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
-        [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
-        [switch]$IncludeAMAHeader,#>
+        [System.Object]$PipedProxy,
         [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
         [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
         [switch]$PassThru
@@ -21,15 +18,8 @@ function Clear-1ASOAPSession
 
     process
     {
-        $Proxy=Get-1ASOAPProxyInternal -Hashtable $PSBoundParameters
-
+        $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
         $Proxy.SessionValue = $null
-<#
-        if($IncludeAMAHeader)
-        {
-            $Proxy.AMA_SecurityHostedUserValue = $null
-        }
-#>        
     }
 
     end

@@ -33,7 +33,7 @@ function Set-1ASOAPSessionAMAHeader
 
     process
     {
-        $Proxy=Get-1ASOAPProxyInternal -Hashtable $PSBoundParameters
+        $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
         $Proxy |
             Clear-1ASOAPSessionAMAHeader -PassThru |

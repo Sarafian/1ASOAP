@@ -27,7 +27,7 @@ function Invoke-1ASOAPOperation
 
     process
     {
-        $Proxy=Get-1ASOAPProxyInternal -Hashtable $PSBoundParameters
+        $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
 <#
         $splatWriteProgress=@{

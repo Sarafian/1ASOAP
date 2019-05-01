@@ -21,7 +21,7 @@ function Start-1ASOAPSession
 
     process
     {
-        $Proxy=Get-1ASOAPProxyInternal -Hashtable $PSBoundParameters
+        $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
         $Proxy |
             Clear-1ASOAPSession -PassThru |

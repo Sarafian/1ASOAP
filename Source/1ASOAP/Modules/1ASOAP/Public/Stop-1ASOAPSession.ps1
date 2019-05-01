@@ -18,7 +18,7 @@ function Stop-1ASOAPSession
 
     process
     {
-        $Proxy=Get-1ASOAPProxyInternal -Hashtable $PSBoundParameters
+        $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
         try
         {

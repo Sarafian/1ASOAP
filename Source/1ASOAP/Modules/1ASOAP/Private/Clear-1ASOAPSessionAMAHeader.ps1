@@ -18,7 +18,7 @@ function Clear-1ASOAPSessionAMAHeader
 
     process
     {
-        $Proxy=Get-1ASOAPProxyInternal -Hashtable $PSBoundParameters
+        $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
         $Proxy.AMA_SecurityHostedUserValue = $null
     }

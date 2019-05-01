@@ -31,7 +31,7 @@ $testCases=@(
 $testCases|ForEach-Object {
     $_.Add("NormalizedUri",([System.Uri]$_.Uri).AbsoluteUri)
 }
-<#
+
 Describe "$prefix Initialize-SOAPProxy without default proxy" {
     BeforeAll {
         Remove-Variable -Name "SOAPProxy*" -Scope Global -ErrorAction SilentlyContinue
@@ -317,7 +317,7 @@ Describe "$prefix Get-SOAPProxy" {
     }
 
 }
-#>
+
 Describe "$prefix Get-SOAPProxyInfo and New-SOAPProxyRequest" {
     BeforeAll {
         Remove-Variable -Name "SOAPProxy*" -Scope Global -ErrorAction SilentlyContinue
@@ -358,9 +358,9 @@ Describe "$prefix Get-SOAPProxyInfo and New-SOAPProxyRequest" {
             $mockMethods |Where-Object -Property Name -EQ $Name
         }
     }
-    $proxy="dummyProxy"
-    It "Get-SOAPProxyInfo -Proxy"{
-        $actual=Get-SOAPProxyInfo -Proxy $proxy
+    $mockProxy="dummyProxy"
+    It "Get-SOAPProxyInfo"{
+        $actual=Get-SOAPProxyInfo
         $actual | Should -Not -BeNullOrEmpty
         $actual.Length | Should -BeExactly 2
         $actual[0].Operation | Should -BeExactly "DoSomething1"
@@ -369,9 +369,27 @@ Describe "$prefix Get-SOAPProxyInfo and New-SOAPProxyRequest" {
         $actual[1].Operation | Should -BeExactly "DoSomething2"
         $actual[1].RequestType | Should -BeExactly ("System.String" -as [type])
         $actual[1].ResponseType | Should -BeExactly ("System.Object" -as [type])
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Proxy -eq $null -and
+            $PipedProxy -eq $null
+        }
+    }
+    It "Get-SOAPProxyInfo -Proxy"{
+        $actual=Get-SOAPProxyInfo -Proxy $mockProxy
+        $actual | Should -Not -BeNullOrEmpty
+        $actual.Length | Should -BeExactly 2
+        $actual[0].Operation | Should -BeExactly "DoSomething1"
+        $actual[0].RequestType | Should -BeExactly ("System.Object" -as [type])
+        $actual[0].ResponseType | Should -BeExactly ("System.String" -as [type])
+        $actual[1].Operation | Should -BeExactly "DoSomething2"
+        $actual[1].RequestType | Should -BeExactly ("System.String" -as [type])
+        $actual[1].ResponseType | Should -BeExactly ("System.Object" -as [type])
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Proxy -eq $mockProxy
+        }
     }
     It "Proxy | Get-SOAPProxyInfo"{
-        $actual=$proxy|Get-SOAPProxyInfo
+        $actual=$mockProxy|Get-SOAPProxyInfo
         $actual | Should -Not -BeNullOrEmpty
         $actual.Length | Should -BeExactly 2
         $actual[0].Operation | Should -BeExactly "DoSomething1"
@@ -380,26 +398,69 @@ Describe "$prefix Get-SOAPProxyInfo and New-SOAPProxyRequest" {
         $actual[1].Operation | Should -BeExactly "DoSomething2"
         $actual[1].RequestType | Should -BeExactly ("System.String" -as [type])
         $actual[1].ResponseType | Should -BeExactly ("System.Object" -as [type])
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $PipedProxy -eq $mockProxy
+        }
+    }
+    It "New-SOAPProxyRequest -Operation DoSomething1"{
+        $actual=New-SOAPProxyRequest -Operation DoSomething1
+        $actual | Should -Not -BeNullOrEmpty
+        $actual |Should -BeOfType "System.Object"
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
     }
     It "New-SOAPProxyRequest -Proxy -Operation DoSomething1"{
-        $actual=New-SOAPProxyRequest -Proxy $proxy -Operation DoSomething1
+        $actual=New-SOAPProxyRequest -Proxy $mockProxy -Operation DoSomething1
         $actual | Should -Not -BeNullOrEmpty
         $actual |Should -BeOfType "System.Object"
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $mockProxy -and 
+            $Hashtable.PipedProxy -eq $null
+        }
     }
     It "Proxy | New-SOAPProxyRequest -Operation DoSomething1"{
-        $actual=$proxy| New-SOAPProxyRequest -Operation DoSomething1
+        $actual=$mockProxy| New-SOAPProxyRequest -Operation DoSomething1
         $actual | Should -Not -BeNullOrEmpty
         $actual |Should -BeOfType "System.Object"
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $mockProxy
+        }
+    }
+    It "New-SOAPProxyRequest -Operation DoSomething2"{
+        $actual=New-SOAPProxyRequest -Operation DoSomething2
+        $actual | Should -Not -BeExactly $null
+        $actual |Should -BeOfType "System.String"
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
     }
     It "New-SOAPProxyRequest -Proxy -Operation DoSomething2"{
-        $actual=New-SOAPProxyRequest -Proxy $proxy -Operation DoSomething2
+        $actual=New-SOAPProxyRequest -Proxy $mockProxy -Operation DoSomething2
         $actual | Should -Not -BeExactly $null
         $actual |Should -BeOfType "System.String"
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $mockProxy -and 
+            $Hashtable.PipedProxy -eq $null
+        }
     }
     It "Proxy | New-SOAPProxyRequest -Operation DoSomething2"{
-        $actual=$proxy | New-SOAPProxyRequest -Operation DoSomething2
+        $actual=$mockProxy | New-SOAPProxyRequest -Operation DoSomething2
         $actual | Should -Not -BeExactly $null
         $actual |Should -BeOfType "System.String"
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $mockProxy
+        }
     }
 
 }
