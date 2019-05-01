@@ -7,6 +7,7 @@ function Test-1ASOAPSession
         [System.Object]$PipedProxy,
         [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
         [Parameter(ValueFromPipeline = $false, ParameterSetName = "Pipeline")]
+        [ValidateSet("Start","InSeries","End")]
         [string]$TransactionStatusCode
     )
 

@@ -29,11 +29,6 @@ function Invoke-1ASOAPOperation
     {
         $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
-<#
-        $splatWriteProgress=@{
-            Activity=$PSScriptRoot
-        }
-#>        
         $faultError = $null
         try
         {
@@ -91,7 +86,6 @@ function Invoke-1ASOAPOperation
                     
                 }
             }
-#            Write-Progress @splatWriteProgress -Status "Invoking $Operation"
             $response = $Proxy.$Operation($Parameter)
         }
         catch
@@ -111,7 +105,6 @@ function Invoke-1ASOAPOperation
         }
         finally
         {
-#            Write-Progress @splatWriteProgress -Completed
             $session = $Proxy|Get-1ASOAPSession
             Write-Debug "Detected TransactionStatusCode=$($session.TransactionStatusCode) session with SessionId=$($session.SessionId) and SecurityToken=$($session.SecurityToken)"
             $response
@@ -120,11 +113,6 @@ function Invoke-1ASOAPOperation
 
     end
     {
-        <#
-        if ($PassThru)
-        {
-            $response
-        }
-        #>
+        
     }
 }

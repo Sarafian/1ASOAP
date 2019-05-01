@@ -26,7 +26,7 @@ function Stop-1ASOAPSession
             Write-Debug "transactionStatusCode=$transactionStatusCode"
             if ($transactionStatusCode -in @("Start", "InSeries"))
             {
-                $securitySignOut = $proxy |New-1ASOAPRequest -Operation Security_SignOut
+                $securitySignOut = $proxy |New-SOAPProxyRequest -Operation Security_SignOut
                 # TODO Why Security_SignOut throws exception?
                 $null = $Proxy | Invoke-1ASOAPOperation -Operation Security_SignOut -Parameter $securitySignOut -WithSession -ErrorAction SilentlyContinue
             }

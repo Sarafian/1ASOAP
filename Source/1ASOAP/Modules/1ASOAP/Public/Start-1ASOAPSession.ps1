@@ -7,9 +7,6 @@ function Start-1ASOAPSession
         [System.Object]$PipedProxy,
         [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
         [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
-        [switch]$IncludeAMAHeader,
-        [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
-        [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
         [switch]$PassThru
     )
 
@@ -25,7 +22,7 @@ function Start-1ASOAPSession
 
         $Proxy |
             Clear-1ASOAPSession -PassThru |
-            Set-segmentDeep -Expression "SessionValue.TransactionStatusCode" -Value "Start"
+            Set-JSONPath -Path "SessionValue.TransactionStatusCode" -Value "Start"
     }
 
     end
