@@ -1,5 +1,5 @@
 JSONPath provides basic functionality similar to Stefan's Goessner [JSONPath][1] concept.
-Please **note** that this is not a full implementation of the concept[1], but it can be further extended.
+Please **note** that this is not a full implementation of the concept, and it can be further extended. Also, the module extends the query functionality with setting and testing as well while always safe guarding against $null instances. Especially the set function will create all intermediate instances required to traverse a path.
 
 ## Goal
 
@@ -19,10 +19,10 @@ The overall goal of this module is to allow a simple processing of objects that 
 </retrievalFacts>
 ```
 
-The module's purpose is best suited when the above structure is defined with typed objects instead of dynamic ones, in a similar way that you would find with WSDL generated classes for a SOAP endpoint.
+The module's purpose is best suited when the above structure is defined with typed objects instead of dynamic ones, in a similar way that you would find with WSDL generated classes for a SOAP endpoint. This module is not related to XML but its inception originates from working with [Amadeus's][2] SOAP API, which is powered by very complex data contracts. With an XML example in mind, which is available on their API, one can visualize the JSONPath and hence the birth of this functionality.
 
 For example if we would like to refer to value of `controlNumber` then we could use an expression like `retrievalFacts.reservationOrProfileIdentifier.reservation.controlNumber`.
-Often, the composite nested structure has arrays and this module will try to abstract this when possible.
+Often, the composite nested structure has arrays and this module will try to abstract this detail when possible.
 For example let's assume that `reservationOrProfileIdentifier` could refer to multiple instances of `reservation`. 
 In this case the above expression would behave like this depending on the action:
 - When the verb is `Find`, then all instances of `reservation` would be included in the query. If the first one was intended then the path should be `retrievalFacts.reservationOrProfileIdentifier.reservation[0].controlNumber`
@@ -37,6 +37,7 @@ This module will make sure that
 
 - `Find-JSONPath`
 - `Set-JSONPath`
+- `Test-JSONPath`
 
 ## Examples
 
@@ -89,4 +90,5 @@ $retrieve.retrievalFacts| Find-JSONPath -Path "retrieve.type" -EQ -Value 3
 ```
 
   
-[1]: https://goessner.net/articles/JsonPath/  
+[1]: https://goessner.net/articles/JsonPath/
+[2]: https://www.amadeus.com
