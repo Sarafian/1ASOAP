@@ -11,7 +11,7 @@ $proxy1=New-WebServiceProxy -URI $uri -Namespace "SOAP" -Class "Proxy"
 $proxy2=New-WebServiceProxy -URI $uri -Namespace "SOAP" -Class "Proxy"
 ```
 
-At this momement, there are two assemblies containing the type `SOAP.Proxy` and all the relevant types. If you would attempt to create an instance of one of this types e.g. `OperationRequest` then you would create a new instance based on the type name `SOAP.OperationRequest` like this
+At this moment, there are two assemblies containing the type `SOAP.Proxy` and all the relevant types. If you would attempt to create an instance of one of this types e.g. `OperationRequest` then you would create a new instance based on the type name `SOAP.OperationRequest` like this
 
 ```powershell
 $request=[SOAP.OperationRequest]::new()
