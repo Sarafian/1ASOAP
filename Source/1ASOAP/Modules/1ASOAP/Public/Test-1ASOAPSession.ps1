@@ -21,14 +21,21 @@ function Test-1ASOAPSession
     {
         $Proxy=Get-SOAPProxy -Hashtable $PSBoundParameters
 
-        if($TransactionStatusCode)
+        if($null -eq $Proxy)
         {
-            ($Proxy|Get-1ASOAPSession -TransactionStatusCode) -eq $TransactionStatusCode
+            $false
         }
         else {
-            $null -ne (Proxy|Get-1ASOAPSession)
+                
+            if($TransactionStatusCode)
+            {
+                ($Proxy|Get-1ASOAPSession -TransactionStatusCode) -eq $TransactionStatusCode
+            }
+            else {
+                $null -ne ($Proxy|Get-1ASOAPSession)
+            }
         }
-    }
+}
 
     end
     {

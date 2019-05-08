@@ -90,15 +90,18 @@ function Invoke-1ASOAPOperation
         }
         catch
         {
-            $faultError = $_.Exception.InnerException
-            switch ($faultError.GetType().Fullname)
+            if($_.Exception.InnerException)
             {
-                "System.Web.Services.Protocols.SoapHeaderException"
-                { 
-                    Write-Debug "faultError.Code=$($faultError.Code)"
-                    Write-Debug "faultError.Message=$($faultError.Message)"
-                    Write-Debug "faultError.Actor=$($faultError.Actor)"
-                    Write-Error $faultError.Message
+                $faultError = $_.Exception.InnerException
+                switch ($faultError.GetType().Fullname)
+                {
+                    "System.Web.Services.Protocols.SoapHeaderException"
+                    { 
+                        Write-Debug "faultError.Code=$($faultError.Code)"
+                        Write-Debug "faultError.Message=$($faultError.Message)"
+                        Write-Debug "faultError.Actor=$($faultError.Actor)"
+                        Write-Error $faultError.Message
+                    }
                 }
             }
             throw
