@@ -1,6 +1,8 @@
 JSONPath provides basic functionality similar to Stefan's Goessner [JSONPath][1] concept.
 Please **note** that this is not a full implementation of the concept, and it can be further extended. Also, the module extends the query functionality with setting and testing as well while always safe guarding against $null instances. Especially the set function will create all intermediate instances required to traverse a path.
 
+Please **note** the original inception of this module was when building an automation over [Amadeus][2]'s SOAP API and for this reason class instance examples are related to this API's datacontracts. XML fragments are used to present a complex instance but the module is not related to XML.
+
 ## Goal
 
 The overall goal of this module is to allow a simple processing of objects that would in memory represented by an XML structure like this:
@@ -37,7 +39,6 @@ This module will make sure that
 
 - `Find-JSONPath`
 - `Set-JSONPath`
-- `Test-JSONPath`
 
 ## Examples
 
@@ -85,7 +86,7 @@ $retrieve| Find-JSONPath -Path "retrievalFacts.invalid.type" -EQ -Value 3
 # The $retrieve instance is returned
 $retrieve| Find-JSONPath -Path "retrievalFacts.retrieve.type" -EQ -Value 3
 
-# The second instance of retrievalFacts is returnes
+# The second instance of retrievalFacts is returns
 $retrieve.retrievalFacts| Find-JSONPath -Path "retrieve.type" -EQ -Value 3
 ```
 
