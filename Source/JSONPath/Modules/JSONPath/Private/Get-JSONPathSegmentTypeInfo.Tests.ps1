@@ -8,7 +8,7 @@ if (-not ("JSONPath.Pester.Root" -as [type]))
 {
     Add-Type -Path "$here\..\..\..\Pester\CS\JSONPath.Pester.cs"
 }
-Add-Type -Path "$here\..\..\..\Pester\Cmdlets-Helpers\Get-RandomValue.ps1"
+. "$here\..\..\..\Pester\Cmdlets-Helpers\Get-RandomValue.ps1"
 
 $singleTestCases=@(
     @{

@@ -28,7 +28,7 @@ function Stop-1ASOAPSession
             {
                 $securitySignOut = $proxy |New-SOAPProxyRequest -Operation Security_SignOut
                 # TODO Why Security_SignOut throws exception?
-                $null = $Proxy | Invoke-1ASOAPOperation -Operation Security_SignOut -Parameter $securitySignOut -WithSession -ErrorAction SilentlyContinue
+                $null = $Proxy | Invoke-1ASOAPOperation -Operation Security_SignOut -Parameter $securitySignOut -ErrorAction SilentlyContinue
             }
             else
             {

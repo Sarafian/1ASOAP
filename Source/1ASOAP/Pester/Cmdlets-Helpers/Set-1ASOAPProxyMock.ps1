@@ -14,7 +14,10 @@ function Set-1ASOAPProxyMock
     {
         $Proxy=New-Object -TypeName "SOAP.Pester.Set1ASOAPProxyMock.Proxy"
     }
+    $Proxy.Url=Get-RandomValue -String
     $Proxy.SessionValue=New-Object -TypeName "SOAP.Pester.Set1ASOAPProxyMock.SessionValue"
+    $Proxy.AMA_SecurityHostedUserValue=New-Object -TypeName "SOAP.Pester.Set1ASOAPProxyMock.AMA_SecurityHostedUserValue"
+
 <#
     $Proxy.AMA_SecurityHostedUserValue=New-Object -TypeName 1ASOAP.Pester.Set1ASOAPProxyMock.AMA_SecurityHostedUserValue
     $Proxy.AMA_SecurityHostedUserValue.UserID=New-Object -TypeName 1ASOAP.Pester.Set1ASOAPProxyMock.UserID

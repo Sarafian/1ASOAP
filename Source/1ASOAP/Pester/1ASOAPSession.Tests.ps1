@@ -144,7 +144,7 @@ Describe "$prefix Get-1ASOAPSession with null proxy"{
 
 }
 
-Describe "$prefix Start-1ASOAPSession and Set-1ASOAPSessionAMAHeader"{
+Describe "$prefix Start-1ASOAPSession"{
     $mockProxy=Set-1ASOAPProxyMock -PassThru
     Mock Get-SOAPProxy {
         $mockProxy
@@ -408,8 +408,7 @@ Describe "$prefix Stop-1ASession" {
                 }
                 Assert-MockCalled Invoke-1ASOAPOperation -Times 1 -Scope It -ParameterFilter {
                     $Operation -eq "Security_SignOut" -and
-                    $Parameter -eq "mock" -and 
-                    $WithSession -eq $true
+                    $Parameter -eq "mock"
                 }
             }
             'End' {
@@ -438,8 +437,7 @@ Describe "$prefix Stop-1ASession" {
                 }
                 Assert-MockCalled Invoke-1ASOAPOperation -Times 1 -Scope It -ParameterFilter {
                     $Operation -eq "Security_SignOut" -and
-                    $Parameter -eq "mock" -and 
-                    $WithSession -eq $true
+                    $Parameter -eq "mock"
                 }
             }
             'End' {
@@ -468,8 +466,7 @@ Describe "$prefix Stop-1ASession" {
                 }
                 Assert-MockCalled Invoke-1ASOAPOperation -Times 1 -Scope It -ParameterFilter {
                     $Operation -eq "Security_SignOut" -and
-                    $Parameter -eq "mock" -and 
-                    $WithSession -eq $true
+                    $Parameter -eq "mock"
                 }
             }
             'End' {

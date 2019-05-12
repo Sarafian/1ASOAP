@@ -59,13 +59,14 @@ Describe "$prefix Invoke-1ASOAPOperation"{
 #>    
     BeforeEach {
         Set-1ASOAPProxyMock -Proxy $mockProxy
+        Set-1ASOAPSessionAMAHeader -Uri $mockProxy.Url -POSType (Get-RandomValue -String)
     }
     It "No Test: Add Operation <Operation> with Parameter <Parameter> to proxy" -TestCases $testCases {
         param($Operation,$Parameter,$TransactionStatusCode)
         $S = {"Response: $Parameter"}
         $mockProxy | Add-Member -MemberType ScriptMethod -Name $Operation -Value $S
     }
-    It "Invoke-1ASOAPOperation -Operation <Operation> -Parameter <Parameter> -WithSession while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
+    It "Invoke-1ASOAPOperation -Operation <Operation> -Parameter <Parameter> while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
         param($Operation,$Parameter,$TransactionStatusCode)
             
         if($null -ne $TransactionStatusCode)
@@ -76,7 +77,7 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $mockProxy.SessionValue=$null
             $mockProxy.AMA_SecurityHostedUserValue=$null
         }
-        $actual=Invoke-1ASOAPOperation -Operation $Operation -Parameter $Parameter -WithSession
+        $actual=Invoke-1ASOAPOperation -Operation $Operation -Parameter $Parameter
         $actual|Should -Not -BeExactly $null
         $actual|Should -BeExactly "Response: $Parameter"
         switch($TransactionStatusCode)
@@ -105,7 +106,7 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $Hashtable.PipedProxy -eq $null
         }
     }
-    It "Invoke-1ASOAPOperation -Proxy -Operation <Operation> -Parameter <Parameter> -WithSession while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
+    It "Invoke-1ASOAPOperation -Proxy -Operation <Operation> -Parameter <Parameter> while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
         param($Operation,$Parameter,$TransactionStatusCode)
             
         if($null -ne $TransactionStatusCode)
@@ -116,7 +117,7 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $mockProxy.SessionValue=$null
             $mockProxy.AMA_SecurityHostedUserValue=$null
         }
-        $actual=Invoke-1ASOAPOperation -Proxy $mockProxy -Operation $Operation -Parameter $Parameter -WithSession
+        $actual=Invoke-1ASOAPOperation -Proxy $mockProxy -Operation $Operation -Parameter $Parameter
         $actual|Should -Not -BeExactly $null
         $actual|Should -BeExactly "Response: $Parameter"
         switch($TransactionStatusCode)
@@ -145,7 +146,7 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $Hashtable.PipedProxy -eq $null
         }
     }
-    It "Proxy|Invoke-1ASOAPOperation -Operation <Operation> -Parameter <Parameter> -WithSession while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
+    It "Proxy|Invoke-1ASOAPOperation -Operation <Operation> -Parameter <Parameter> while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
         param($Operation,$Parameter,$TransactionStatusCode)
             
         if($null -ne $TransactionStatusCode)
@@ -156,7 +157,7 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $mockProxy.SessionValue=$null
             $mockProxy.AMA_SecurityHostedUserValue=$null
         }
-        $actual=$mockProxy|Invoke-1ASOAPOperation -Operation $Operation -Parameter $Parameter -WithSession
+        $actual=$mockProxy|Invoke-1ASOAPOperation -Operation $Operation -Parameter $Parameter
         $actual|Should -Not -BeExactly $null
         $actual|Should -BeExactly "Response: $Parameter"
         switch($TransactionStatusCode)
@@ -185,6 +186,7 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $Hashtable.PipedProxy -ne $null
         }
     }
+<#
     It "Invoke-1ASOAPOperation -Operation <Operation> -Parameter <Parameter> while with session TransactionStatusCode <TransactionStatusCode>" -TestCases $testCases {
         param($Operation,$Parameter,$TransactionStatusCode)
             
@@ -254,4 +256,5 @@ Describe "$prefix Invoke-1ASOAPOperation"{
             $Hashtable.PipedProxy -ne $null
         }
     }
+#>    
 }

@@ -10,13 +10,7 @@ function Invoke-1ASOAPOperation
         [string]$Operation,
         [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
         [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
-        [System.Object]$Parameter,
-        [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
-        [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
-        [switch]$WithSession,
-        [Parameter(Mandatory = $false, ParameterSetName = "Parameter")]
-        [Parameter(Mandatory = $false, ParameterSetName = "Pipeline")]
-        [switch]$PassThru
+        [System.Object]$Parameter
     )
 
     begin
@@ -32,65 +26,47 @@ function Invoke-1ASOAPOperation
         $faultError = $null
         try
         {
-            if ($WithSession)
-            {   
-                $transactionStatusCode = $Proxy|Get-1ASOAPSession -TransactionStatusCode
-                Write-Debug "transactionStatusCode=$transactionStatusCode"
-                switch ($transactionStatusCode)
-                {
-                    'None'
-                    {
-                        $Proxy | 
-                            Start-1ASOAPSession -PassThru |
-                            Set-1ASOAPSessionAMAHeader
-                        
-                        Write-Verbose "Starting new session"
-                    }
-                    'Start'
-                    { 
-                        $Proxy | Set-1ASOAPSessionAMAHeader
-                        Write-Verbose "Starting new session"
-                    }
-                    'InSeries'
-                    { 
-                        $Proxy | Clear-1ASOAPSessionAMAHeader
-
-                        $session = $Proxy|Get-1ASOAPSession
-                        Write-Debug "session.SessionId=$($session.SessionId)"
-                        Write-Debug "session.SecurityToken=$($session.SessSecurityTokenionId)"
-                        Write-Verbose "Using session with SessionId=$($session.SessionId) and SecurityToken=$($session.SecurityToken)"
-                    }
-                    'End'
-                    { 
-                        $session = $Proxy|Get-1ASOAPSession
-                        $Proxy | 
-                            Start-1ASOAPSession -PassThru |
-                            Set-1ASOAPSessionAMAHeader
-                        
-                        Write-Warning "Found ended SessionId=$($session.SessionId) and SecurityToken=$($session.SecurityToken). Starting new session"
-                    }
-                }
-
-            }
-            else
+            $transactionStatusCode = $Proxy|Get-1ASOAPSession -TransactionStatusCode
+            Write-Debug "transactionStatusCode=$transactionStatusCode"
+            switch ($transactionStatusCode)
             {
-                if ($Proxy|Test-1ASOAPSession)
+                'None'
                 {
                     $Proxy | 
-                        Clear-1ASOAPSession -PassThru |
+                        Start-1ASOAPSession -PassThru |
                         Set-1ASOAPSessionAMAHeader
-
-                    Write-Warning "Found existing SessionId=$($session.SessionId) and SecurityToken=$($session.SecurityToken). Removing"
-                } 
-                else {
                     
+                    Write-Verbose "Starting new session"
+                }
+                'Start'
+                { 
+                    $Proxy | Set-1ASOAPSessionAMAHeader
+                    Write-Verbose "Starting new session"
+                }
+                'InSeries'
+                { 
+                    $Proxy | Clear-1ASOAPSessionAMAHeader
+
+                    $session = $Proxy|Get-1ASOAPSession
+                    Write-Debug "session.SessionId=$($session.SessionId)"
+                    Write-Debug "session.SecurityToken=$($session.SessSecurityTokenionId)"
+                    Write-Verbose "Using session with SessionId=$($session.SessionId) and SecurityToken=$($session.SecurityToken)"
+                }
+                'End'
+                { 
+                    $session = $Proxy|Get-1ASOAPSession
+                    $Proxy | 
+                        Start-1ASOAPSession -PassThru |
+                        Set-1ASOAPSessionAMAHeader
+                    
+                    Write-Warning "Found ended SessionId=$($session.SessionId) and SecurityToken=$($session.SecurityToken). Starting new session"
                 }
             }
             $response = $Proxy.$Operation($Parameter)
         }
         catch
         {
-            if($_.Exception.InnerException)
+            if($null -ne $_.Exception.InnerException)
             {
                 $faultError = $_.Exception.InnerException
                 switch ($faultError.GetType().Fullname)

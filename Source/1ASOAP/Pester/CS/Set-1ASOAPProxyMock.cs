@@ -6,6 +6,7 @@ namespace SOAP.Pester.Set1ASOAPProxyMock
     {
         public SessionValue SessionValue{get;set;}
         public AMA_SecurityHostedUserValue AMA_SecurityHostedUserValue{get;set;}
+        public string Url{get;set;}
     }
     public class SessionValue
     {
