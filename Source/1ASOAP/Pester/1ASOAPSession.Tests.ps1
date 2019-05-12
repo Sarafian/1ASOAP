@@ -143,7 +143,6 @@ Describe "$prefix Get-1ASOAPSession with null proxy"{
     }
 
 }
-
 Describe "$prefix Start-1ASOAPSession"{
     $mockProxy=Set-1ASOAPProxyMock -PassThru
     Mock Get-SOAPProxy {
@@ -473,6 +472,301 @@ Describe "$prefix Stop-1ASession" {
                 Assert-MockCalled New-SOAPProxyRequest -Times 0 -Scope It
                 Assert-MockCalled Invoke-1ASOAPOperation -Times 0 -Scope It
             }
+        }
+    }
+}
+
+Describe "$prefix Set-1ASOAPSessionAMAHeader"{
+    $testCases=@(
+        @{
+            ExpectedSetJSONPathMockCount=0
+        }
+        @{
+            POSType=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+#<#
+        @{
+            RequestorType=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            PseudoCityCode=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            AgentDutyCode=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            CompanyName=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            POSType=Get-RandomValue -String
+            RequestorType=Get-RandomValue -String
+            PseudoCityCode=Get-RandomValue -String
+            AgentDutyCode=Get-RandomValue -String
+            CompanyName=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=5
+        }
+    )|ForEach-Object{
+        $splat=@{}
+        foreach($key in $_.Keys)
+        {
+            if($key -ne "ExpectedSetJSONPathMockCount")
+            {
+                $splat.Add($key,$_.$key)
+            }
+        }
+        $_.Add("Splat",$splat)
+        $_
+    }
+
+    $mockProxy=Set-1ASOAPProxyMock -PassThru
+    Mock Get-SOAPProxy {
+        $mockProxy
+    }
+    Mock Set-JSONPath {
+        switch($Path) {
+            '' {
+
+            }
+        }
+    }
+
+    BeforeEach {
+        Set-1ASOAPProxyMock -Proxy $mockProxy
+    }
+
+    It "Set-1ASOAPSessionAMAHeader -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        $proxy=Set-1ASOAPSessionAMAHeader @Splat
+        $proxy | Should -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+
+    It "Set-1ASOAPSessionAMAHeader -Proxy -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        $proxy=Set-1ASOAPSessionAMAHeader -Proxy $mockProxy @Splat
+        $proxy | Should -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -ne $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+    It "Proxy | Set-1ASOAPSessionAMAHeader -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        $proxy=$mockProxy | Set-1ASOAPSessionAMAHeader @Splat
+        $proxy | Should -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -ne $null
+        }
+    }
+    It "Set-1ASOAPSessionAMAHeader -PassThru -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        $proxy=Set-1ASOAPSessionAMAHeader @Splat -PassThru 
+        $proxy | Should -Not -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+
+    It "Set-1ASOAPSessionAMAHeader -Proxy -PassThru -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        $proxy=Set-1ASOAPSessionAMAHeader -Proxy $mockProxy @Splat -PassThru 
+        $proxy | Should -Not -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -ne $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+    It "Proxy | Set-1ASOAPSessionAMAHeader -POSType -PassThru <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        $proxy=$mockProxy | Set-1ASOAPSessionAMAHeader @Splat -PassThru 
+        $proxy | Should -Not -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -ne $null
+        }
+    }
+}
+
+Describe "$prefix Set-1ASOAPSessionAMAHeader PSSession"{
+    $testCases=@(
+        @{
+            ExpectedSetJSONPathMockCount=0
+        }
+        @{
+            POSType=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            RequestorType=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            PseudoCityCode=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            AgentDutyCode=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            CompanyName=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=1
+        }
+        @{
+            POSType=Get-RandomValue -String
+            RequestorType=Get-RandomValue -String
+            PseudoCityCode=Get-RandomValue -String
+            AgentDutyCode=Get-RandomValue -String
+            CompanyName=Get-RandomValue -String
+            ExpectedSetJSONPathMockCount=5
+        }
+    )|ForEach-Object{
+        $splat=@{}
+        foreach($key in $_.Keys)
+        {
+            if($key -ne "ExpectedSetJSONPathMockCount")
+            {
+                $splat.Add($key,$_.$key)
+            }
+        }
+        $_.Add("Splat",$splat)
+        $_
+    }
+
+    $mockProxy=Set-1ASOAPProxyMock -PassThru
+    Mock Get-SOAPProxy {
+        $mockProxy
+    }
+    Mock Set-JSONPath {
+        switch($Path) {
+            '' {
+
+            }
+        }
+    }
+
+    BeforeEach {
+        Set-1ASOAPProxyMock -Proxy $mockProxy
+    }
+
+    It "Set-1ASOAPSessionAMAHeader -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        Set-1ASOAPSessionAMAHeader @Splat -Uri $mockProxy.Url
+        $proxy=Set-1ASOAPSessionAMAHeader 
+        $proxy | Should -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+
+    It "Set-1ASOAPSessionAMAHeader -Proxy -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        Set-1ASOAPSessionAMAHeader @Splat -Uri $mockProxy.Url
+        $proxy=Set-1ASOAPSessionAMAHeader -Proxy $mockProxy
+        $proxy | Should -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -ne $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+    It "Proxy | Set-1ASOAPSessionAMAHeader -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        Set-1ASOAPSessionAMAHeader @Splat -Uri $mockProxy.Url
+        $proxy=$mockProxy|Set-1ASOAPSessionAMAHeader 
+        $proxy | Should -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -ne $null
+        }
+    }
+    It "Set-1ASOAPSessionAMAHeader -PassThru -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        Set-1ASOAPSessionAMAHeader @Splat -Uri $mockProxy.Url
+        $proxy=Set-1ASOAPSessionAMAHeader -PassThru 
+        $proxy | Should -Not -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+
+    It "Set-1ASOAPSessionAMAHeader -Proxy -PassThru -POSType <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        Set-1ASOAPSessionAMAHeader @Splat -Uri $mockProxy.Url
+        $proxy=Set-1ASOAPSessionAMAHeader -Proxy $mockProxy -PassThru 
+        $proxy | Should -Not -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -ne $null -and 
+            $Hashtable.PipedProxy -eq $null
+        }
+    }
+    It "Proxy | Set-1ASOAPSessionAMAHeader -POSType -PassThru <POSType> -RequestorType <RequestorType> -PseudoCityCode <PseudoCityCode> -AgentDutyCode <AgentDutyCode> -CompanyName <CompanyName>" -TestCases $testCases{
+        param($POSType,$RequestorType,$PseudoCityCode,$AgentDutyCode,$CompanyName,$ExpectedSetJSONPathMockCount,$Splat)
+        Set-1ASOAPSessionAMAHeader @Splat -Uri $mockProxy.Url
+        $proxy=$mockProxy |Set-1ASOAPSessionAMAHeader -PassThru 
+        $proxy | Should -Not -BeExactly $null
+        $mockProxy.SessionValue|Should -Not -BeExactly $null
+
+        Assert-MockCalled Set-JSONPath -Times $ExpectedSetJSONPathMockCount -Scope It
+        Assert-MockCalled Get-SOAPProxy -Times 1 -Scope It -ParameterFilter {
+            $Hashtable -ne $null -and 
+            $Hashtable.Proxy -eq $null -and 
+            $Hashtable.PipedProxy -ne $null
         }
     }
 }
