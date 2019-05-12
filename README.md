@@ -46,7 +46,7 @@ The repository is composed by 3 modules. Each can be isolated and has the potent
   - this is not a full implementation of the idea, but it can be further extender.
   - it uses the same concepts both to drive `Set`, `Get`, `Test` and `Find`
 - [SOAPProxy][4] that provides some basic functionality around [New-WebServiceProxy][7] to address the dynamic injection of .NET assemblies into the session. 
-- [A1SOAP][5] that provides functionality around the 1A `Session` and `AMA_SecurityHostedUser` headers
+- [1ASOAP][5] that provides functionality around the 1A `Session` and `AMA_SecurityHostedUser` headers
 
 ## Samples
 
@@ -82,6 +82,6 @@ finally
 [2]: https://developers.amadeus.com/enterprise
 [3]: Source/JSONPath/README.md
 [4]: Source/SOAPProxy/README.md
-[5]: Source/A1SOAP/README.md
+[5]: Source/1ASOAP/README.md
 [6]: https://goessner.net/articles/JsonPath/
 [7]: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-webserviceproxy?view=powershell-5.1
