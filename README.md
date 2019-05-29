@@ -50,6 +50,7 @@ The repository is composed by 3 modules. Each can be isolated and has the potent
 
 ## Samples
 
+**A simple PNR_Retrieve**
 ```powershell
 # Initialize Proxy
 $proxy=Initialize-1ASOAPProxy -Uri $URI -Namespace "amadeus.soap.example" -AsDefault -PassThru
@@ -78,6 +79,7 @@ finally
 }
 ```
 
+**Calculate SOF (Seat Occupancy Factor) and export to CSV**
 ```powershell
 # Initialize Proxy
 $proxy=Initialize-1ASOAPProxy -Uri $URI -Namespace "amadeus.soap.example" -AsDefault -PassThru
