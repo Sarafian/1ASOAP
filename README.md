@@ -65,7 +65,7 @@ try
     Set-JSONPath -Path "retrievalFacts.reservationOrProfileIdentifier.controlNumber" -Value $pnr
 
   # Invoke PNR_Retrieve operation over 1A  
-  $pnrRetrieveResponse = $proxy|Invoke-SN1AOperation -Operation PNR_Retrieve -Parameter $pnrRetrieve -WithSession
+  $pnrRetrieveResponse = $proxy|Invoke-1AOperation -Operation PNR_Retrieve -Parameter $pnrRetrieve
 
   # Capture all dataelements having ssr type CTCE
   $dataElementsIndivWithCTCE=$pnrRetrieveResponse.dataElementsMaster.dataElementsIndiv | 
@@ -77,6 +77,62 @@ finally
   Stop-1ASOAPSession
 }
 ```
+
+```powershell
+# Initialize Proxy
+$proxy=Initialize-1ASOAPProxy -Uri $URI -Namespace "amadeus.soap.example" -AsDefault -PassThru
+try
+{
+	# Create the request object
+	$invAdvancedGetFlightDataRequest = $proxy |New-SOAPProxyRequest -Operation Inv_AdvancedGetFlightData
+
+	# Fill in the structure of the Inv_AdvancedGetFlightData request
+	$invAdvancedGetFlightDataRequest |
+		Set-JSONPath -Path "flightDate.airlineInformation.airlineCode" -Value "SN" -PassThru |
+		Set-JSONPath -Path "flightDate.flightReference.flightNumber" -Value $flight.Number -PassThru |
+		Set-JSONPath -Path "flightDate.departureDate" -Value $flight.Date -PassThru |
+		Set-JSONPath -Path "flightDate.boardPoint" -Value $flight.Origin -PassThru |
+		Set-JSONPath -Path "flightDate.offPoint" -Value $flight.Destination -PassThru |
+		Set-JSONPath -Path "grabLock[0].statusIndicator" -Value "GBL" -PassThru |
+		Set-JSONPath -Path "grabLock[0].actionRequest" -Value "2"
+
+	# Invoke PNR_Retrieve operation over 1A  
+	$invAdvancedGetFlightDataResponse = $proxy|Invoke-1ASOAPOperation -Operation Inv_AdvancedGetFlightData -Parameter $invAdvancedGetFlightDataRequest
+
+	# Process data to create a report per leg with SOF, CabinCode, BookingCounter and Capacity
+	$csvData=$invAdvancedGetFlightDataResponse.flightDateInformation.legs |ForEach-Object {
+		#Iterate on eash leg
+		$leg=$_
+		$leg.legCabins |ForEach-Object {
+			# Iterate on each cabin within each leg
+			$legCabin=$_
+			# Extract the configuration with qualifier O
+			$configuration=$_.legCabin|Where-Object -Property qualifier -EQ "O"
+			$bookingCounter=$_.cabinAvailabilities.bookingsCounter
+			# calculate the SOF
+			$sof=$bookingCounter/($configuration.cabinCapacity)
+
+			# Create a new instance to put in the csv
+			New-Object -TypeName psobject -Property @{
+				Origin=$leg.leg.legDetails[0]
+				Destination=$leg.leg.legDetails[1]
+				CabinCode=$configuration.cabinCode
+				Capacity=$configuration.cabinCapacity
+				BookingCounter=$bookingCounter
+				SOF=$sof
+			}
+		}
+	}
+	$csvData|ConvertTo-Csv|Out-File -FilePath $csvPath -Force
+}
+finally
+{
+  # Stop the 1A session present in the proxy
+  Stop-1ASOAPSession
+}
+```
+
+
 
 [1]: https://www.amadeus.com
 [2]: https://developers.amadeus.com/enterprise
