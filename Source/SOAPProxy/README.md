@@ -36,6 +36,7 @@ The module can handle multiple proxies and since this ability is incorporated wi
 - `Get-SOAPProxy` returns a proxy. If the URI is not specified, then a default one is attempted to be retrieved.
 - `Get-SOAPProxyInfo` returns a recordset, where each record contains the name of an Operation and the full type names for its request and response types.
 - `New-SOAPProxyRequest` returns an instance intended to be used by the specified operation of a proxy.
+- `Trace-SOAPProxy` helps with understanding how the request and response types of an operation are. This is effectively a redirection to `Trace-JSONPath` from the [JSONPath][2] module.
 
 Effectively, the proxy instance is used as the driver for everything. As an instance, it has a type in .NET and all types are part of an assembly.
 
@@ -75,3 +76,4 @@ $proxyInfo2=Get-ProxyInfo -Proxy $proxy1
 ```
 
 [1]: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-webserviceproxy?view=powershell-5.1
+[2]: /Sarafian/1ASOAP/Source/JSONPath/README.md
