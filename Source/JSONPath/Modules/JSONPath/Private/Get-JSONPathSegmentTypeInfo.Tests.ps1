@@ -71,7 +71,7 @@ $invalidTestCases=@(
     }
 )
 
-Describe "$prefix" {
+Describe "$prefix Info" {
     
     It "Single <Segment> returns object with PropertyType=<PropertyType> and IsPrimitiveOrString=<IsPrimitiveOrString>" -TestCases $singleTestCases {
         param ( $Segment, $PropertyType, $IsPrimitiveOrString)
@@ -128,5 +128,81 @@ Describe "$prefix" {
             PropertyName = $Segment
         }
         {Get-JSONPathSegmentTypeInfo -Info $info -Type ("JSONPath.Pester.Root")} | Should -Throw
+    }
+}
+Describe "$prefix Property" {
+    
+    It "Single <Segment> returns object with PropertyType=<PropertyType> and IsPrimitiveOrString=<IsPrimitiveOrString>" -TestCases $singleTestCases {
+        param ( $Segment, $PropertyType, $IsPrimitiveOrString)
+        $info=[PSCustomObject]@{
+            Segment = $Segment
+            PropertyName = $Segment
+            IsIndexDeclared=$false
+            Index=$null
+        }
+
+        $actualTypeInfo=Get-JSONPathSegmentTypeInfo -Trace -PropertyName $Segment -Type ("JSONPath.Pester.Root" -as [type])
+        $actualTypeInfo | Should -Not -BeNullOrEmpty
+        $actualTypeInfo.GetType().Fullname | Should -BeExactly "System.Management.Automation.PSCustomObject"
+        $actualTypeInfo.Segment | Should -BeExactly $info.Segment
+        $actualTypeInfo.PropertyName | Should -BeExactly $info.PropertyName
+        $actualTypeInfo.IsIndexDeclared | Should -BeExactly $info.IsIndexDeclared
+        $actualTypeInfo.Index | Should -BeExactly $info.Index
+
+        $actualTypeInfo.PropertyType | Should -BeExactly $PropertyType
+        $actualTypeInfo.IsPropertyArray | Should -BeExactly $false
+        $actualTypeInfo.ArrayElementType | Should -BeExactly $null
+        $actualTypeInfo.IsPrimitiveOrString | Should -BeExactly $IsPrimitiveOrString
+
+        $actualTypeInfo.Trace | Should -Not -BeExactly $null
+        if($IsPrimitiveOrString)
+        {
+            $actualTypeInfo.Trace | Should -BeLike "$($info.PropertyName)=*"
+        }
+        else {
+            $actualTypeInfo.Trace | Should -BeExactly $info.PropertyName
+        }
+        
+
+    }
+    It "Array <Segment> returns object with PropertyType=<PropertyType> and IsPrimitiveOrString=<IsPrimitiveOrString>" -TestCases ($arrayTestCases|Where-Object -Property Index -EQ $null) {
+        param ( $Segment, $PropertyType, $IsPrimitiveOrString, $Index)
+        $info=[PSCustomObject]@{
+            Segment = "$Segment[0]"
+            PropertyName = $Segment
+            IsIndexDeclared=$true
+            Index=0
+        }
+        
+        $actualTypeInfo=Get-JSONPathSegmentTypeInfo -Trace -PropertyName $Segment -Type ("JSONPath.Pester.Root" -as [type])
+        $actualTypeInfo | Should -Not -BeNullOrEmpty
+        $actualTypeInfo.GetType().Fullname | Should -BeExactly "System.Management.Automation.PSCustomObject"
+        $actualTypeInfo.Segment | Should -BeExactly $info.Segment
+        $actualTypeInfo.PropertyName | Should -BeExactly $info.PropertyName
+        $actualTypeInfo.IsIndexDeclared | Should -BeExactly $info.IsIndexDeclared
+        $actualTypeInfo.Index | Should -BeExactly $info.Index
+
+        $actualTypeInfo.PropertyType | Should -BeExactly $PropertyType
+        $actualTypeInfo.IsPropertyArray | Should -BeExactly $true
+        $actualTypeInfo.ArrayElementType | Should -BeExactly $PropertyType.GetElementType()
+        $actualTypeInfo.IsPrimitiveOrString | Should -BeExactly $IsPrimitiveOrString
+
+        $actualTypeInfo.Trace | Should -Not -BeExactly $null
+        if($IsPrimitiveOrString)
+        {
+            ($actualTypeInfo.Trace -split "=").Count| Should -BeExactly 2
+        }
+        else {
+            $actualTypeInfo.Trace | Should -BeExactly $info.Segment
+        }
+
+    }
+    It "Invalid <Segment> throws error" -TestCases $invalidTestCases {
+        param ( $Segment)
+        $info=[PSCustomObject]@{
+            Segment = $Segment
+            PropertyName = $Segment
+        }
+        {Get-JSONPathSegmentTypeInfo -Trace -PropertyName $Segment -Type ("JSONPath.Pester.Root")} | Should -Throw
     }
 }
