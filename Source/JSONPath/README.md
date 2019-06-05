@@ -35,10 +35,16 @@ This module will make sure that
 - during `Find` operation, all intermediate steps will be guarded against null values and when an arrays is found all instances will be processes.
 - during `Set` operation, all missing instances will be created based on the matching type. If the target property is an array, then a new array will be created.
 
+The `Trace` functionality was added to help visualize the structure of a given type, which sometimes can become very complicated due to multiple levels of composition. The functionality offers two modes:
+
+- A trace as an array of valid JSONPath expressions where when a array property is encountered, the expression uses a zero index array. This is also an indication that the specific segment in the JSONPath represents an array.
+- A code rendering using `Set-JSONPath`
+
 ## Cmdlets
 
 - `Find-JSONPath`
 - `Set-JSONPath`
+- `Trace-JSONPath`
 
 ## Examples
 
@@ -90,6 +96,80 @@ $retrieve| Find-JSONPath -Path "retrievalFacts.retrieve.type" -EQ -Value 3
 $retrieve.retrievalFacts| Find-JSONPath -Path "retrieve.type" -EQ -Value 3
 ```
 
+# Trace Examples
+
+For this section, the [Root][3] from Pester tests will be used
+
+The following command  `Trace-JSONPath -Type ("JSONPath.Pester.Type2" -as [type])` returns the following permutations
+
+```text
+IntArray[0]=0
+IntSingle=0
+StringArray[0]="String"
+StringSingle="String"
+Type1Array[0].IntArray[0]=0
+Type1Array[0].IntSingle=0
+Type1Array[0].StringArray[0]="String"
+Type1Array[0].StringSingle="String"
+Type1Array[0].Type2Array[0].IntArray[0]=0
+Type1Array[0].Type2Array[0].IntSingle=0
+Type1Array[0].Type2Array[0].StringArray[0]="String"
+Type1Array[0].Type2Array[0].StringSingle="String"
+Type1Array[0].Type2Single.IntArray[0]=0
+Type1Array[0].Type2Single.IntSingle=0
+Type1Array[0].Type2Single.StringArray[0]="String"
+Type1Array[0].Type2Single.StringSingle="String"
+Type1Single.IntArray[0]=0
+Type1Single.IntSingle=0
+Type1Single.StringArray[0]="String"
+Type1Single.StringSingle="String"
+Type1Single.Type2Array[0].IntArray[0]=0
+Type1Single.Type2Array[0].IntSingle=0
+Type1Single.Type2Array[0].StringArray[0]="String"
+Type1Single.Type2Array[0].StringSingle="String"
+Type1Single.Type2Single.IntArray[0]=0
+Type1Single.Type2Single.IntSingle=0
+Type1Single.Type2Single.StringArray[0]="String"
+Type1Single.Type2Single.StringSingle="String"
+```
+
+The render functionality of `Trace-JSONPath` uses the above trace set, to generate a code fragment that is ready to use in PowerShell. 
+`Trace-JSONPath -Type ("JSONPath.Pester.Type2" -as [type]) -RenderCode` renders the following code fragment.
+
+```powershell
+$obj=New-Object -TypeName "JSONPath.Pester.Root"
+$obj=Set-JSONPath -Path "Type1Single.Type2Single.StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.IntArray[0]" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[0].StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[0].StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[0].IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[0].IntArray[0]" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Single.StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Single.StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Single.IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Single.IntArray[0]" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Single.StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Single.StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Single.IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Single.IntArray[0]" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Array[0].StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Array[0].StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Array[0].IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Array[0].Type2Array[0].IntArray[0]" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Array[0].StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Array[0].StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "Type1Array[0].IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "Type1Array[0].IntArray[0]" -Value 0 -PassThru |
+	Set-JSONPath -Path "StringSingle" -Value "String" -PassThru |
+	Set-JSONPath -Path "StringArray[0]" -Value "String" -PassThru |
+	Set-JSONPath -Path "IntSingle" -Value 0 -PassThru |
+	Set-JSONPath -Path "IntArray[0]" -Value 0
+```
+
+
   
 [1]: https://goessner.net/articles/JsonPath/
 [2]: https://www.amadeus.com
+[3]: JSONPath/Pester/CS/JSONPath.Pester.cs
