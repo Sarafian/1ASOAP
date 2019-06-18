@@ -2,13 +2,13 @@ function Get-JSONPathSegmentTypeInfo
 {
     param(
         [Parameter(Mandatory = $true, ParameterSetName = "Info")]
-        [Parameter(Mandatory = $true, ParameterSetName = "Trace")]
+        [Parameter(Mandatory = $true, ParameterSetName = "TypeTrace")]
         [System.Type]$Type,
         [Parameter(Mandatory = $true, ParameterSetName = "Info")]
         [psobject]$Info,
-        [Parameter(Mandatory = $true, ParameterSetName = "Trace")]
+        [Parameter(Mandatory = $true, ParameterSetName = "TypeTrace")]
         [string]$PropertyName,
-        [Parameter(Mandatory = $true, ParameterSetName = "Trace")]
+        [Parameter(Mandatory = $true, ParameterSetName = "TypeTrace")]
         [switch]$Trace
     )
 
@@ -22,7 +22,7 @@ function Get-JSONPathSegmentTypeInfo
             'Info' {
                 $prefix="[$($Info.Segment)]"
             }
-            'Trace' {
+            'TypeTrace' {
                 $prefix="[$PropertyName]"
             }
         }
@@ -40,7 +40,7 @@ function Get-JSONPathSegmentTypeInfo
                     Index=$Info.Index
                 }
             }
-            'Trace' {
+            'TypeTrace'{
                 $typeInfoHash=@{
                     PropertyName=$PropertyName
                 }
@@ -69,7 +69,7 @@ function Get-JSONPathSegmentTypeInfo
             $typeInfoHash.Add("IsPrimitiveOrString",$propertyType.IsPrimitive -or ($propertyType.FullName -eq "System.String"))
         }
         
-        if($PSCmdlet.ParameterSetName -eq "Trace")
+        if($PSCmdlet.ParameterSetName -eq "TypeTrace")
         {
             if ($propertyType.IsArray) {
                 $typeInfoHash.Add("Segment","$PropertyName[0]")
@@ -83,6 +83,7 @@ function Get-JSONPathSegmentTypeInfo
                 $typeInfoHash.Add("Index",$null)
                 $traceValueType=$typeInfoHash.PropertyType
             }
+
             $traceSegments=@(
                 $typeInfoHash.Segment
             )
@@ -98,6 +99,7 @@ function Get-JSONPathSegmentTypeInfo
             }
             $typeInfoHash.Add("Trace",($traceSegments -join "="))
         }
+
         New-Object -TypeName psobject -Property $typeInfoHash
     }
 
