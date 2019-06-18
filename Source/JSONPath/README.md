@@ -100,6 +100,8 @@ $retrieve.retrievalFacts| Find-JSONPath -Path "retrieve.type" -EQ -Value 3
 
 For this section, the [Root][3] from Pester tests will be used
 
+## Example 1 - Type tracing
+
 The following command  `Trace-JSONPath -Type ("JSONPath.Pester.Type2" -as [type])` returns the following permutations
 
 ```text
@@ -133,12 +135,80 @@ Type1Single.Type2Single.StringArray[0]="String"
 Type1Single.Type2Single.StringSingle="String"
 ```
 
+## Example 2 - Object trace
+
+Let's assume that we want to see all JSONPaths with a value in a given object. To help visualize, we use this code to initialize the object
+
+```powershell
+$obj=$obj |	Set-JSONPath -Path "Type1Array[1].Type2Single.StringSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Single.IntSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Single.StringArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Single.IntArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Array[1].StringSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Array[1].IntSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Array[1].StringArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Array[1].Type2Array[1].IntArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.StringSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.IntSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.StringArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Single.IntArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[1].StringSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[1].IntSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[1].StringArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "Type1Single.Type2Array[1].IntArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "StringSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "IntSingle" -Value 1 -PassThru |
+	Set-JSONPath -Path "StringArray[1]" -Value 2 -PassThru |
+	Set-JSONPath -Path "IntArray[1]" -Value 2 -PassThru
+```
+
+**Notice that all arrays are missing on purpose the zero index to showcase how they are visualized:
+- When not a primitive, then it won't show
+- When a primitive string then it will render like `=""(null)` because for PowerShell strings that are `$null` or empty are considered the same. All values will be wrapped in double quotes to quickly reveal that the primitive is a string.
+- When a primitive int then it will render like `=0`
+
+```text
+IntArray[0]=0
+IntArray[1]=2
+IntSingle=1
+StringArray[0]=""(null)
+StringArray[1]="2"
+StringSingle="1"
+Type1Array[1].Type2Array[1].IntArray[0]=0
+Type1Array[1].Type2Array[1].IntArray[1]=2
+Type1Array[1].Type2Array[1].IntSingle=1
+Type1Array[1].Type2Array[1].StringArray[0]=""(null)
+Type1Array[1].Type2Array[1].StringArray[1]="2"
+Type1Array[1].Type2Array[1].StringSingle="1"
+Type1Array[1].Type2Single.IntArray[0]=0
+Type1Array[1].Type2Single.IntArray[1]=2
+Type1Array[1].Type2Single.IntSingle=1
+Type1Array[1].Type2Single.StringArray[0]=""(null)
+Type1Array[1].Type2Single.StringArray[1]="2"
+Type1Array[1].Type2Single.StringSingle="1"
+Type1Single.Type2Array[1].IntArray[0]=0
+Type1Single.Type2Array[1].IntArray[1]=2
+Type1Single.Type2Array[1].IntSingle=1
+Type1Single.Type2Array[1].StringArray[0]=""(null)
+Type1Single.Type2Array[1].StringArray[1]="2"
+Type1Single.Type2Array[1].StringSingle="1"
+Type1Single.Type2Single.IntArray[0]=0
+Type1Single.Type2Single.IntArray[1]=2
+Type1Single.Type2Single.IntSingle=1
+Type1Single.Type2Single.StringArray[0]=""(null)
+Type1Single.Type2Single.StringArray[1]="2"
+Type1Single.Type2Single.StringSingle="1"
+```
+
+
+## Example 3 - Render tracing
+
 The render functionality of `Trace-JSONPath` uses the above trace set, to generate a code fragment that is ready to use in PowerShell. 
 `Trace-JSONPath -Type ("JSONPath.Pester.Type2" -as [type]) -RenderCode` renders the following code fragment.
 
 ```powershell
 $obj=New-Object -TypeName "JSONPath.Pester.Root"
-$obj=Set-JSONPath -Path "Type1Single.Type2Single.StringSingle" -Value "String" -PassThru |
+$obj=obj|Set-JSONPath -Path "Type1Single.Type2Single.StringSingle" -Value "String" -PassThru |
 	Set-JSONPath -Path "Type1Single.Type2Single.StringArray[0]" -Value "String" -PassThru |
 	Set-JSONPath -Path "Type1Single.Type2Single.IntSingle" -Value 0 -PassThru |
 	Set-JSONPath -Path "Type1Single.Type2Single.IntArray[0]" -Value 0 -PassThru |
@@ -167,8 +237,6 @@ $obj=Set-JSONPath -Path "Type1Single.Type2Single.StringSingle" -Value "String" -
 	Set-JSONPath -Path "IntSingle" -Value 0 -PassThru |
 	Set-JSONPath -Path "IntArray[0]" -Value 0
 ```
-
-
   
 [1]: https://goessner.net/articles/JsonPath/
 [2]: https://www.amadeus.com
